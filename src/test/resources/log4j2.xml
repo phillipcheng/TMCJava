@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+  <Appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+    </Console>
+    <File name="File" fileName="test.log">
+      <PatternLayout>
+        <pattern>%d %p %C{1.} [%t] %m%n</pattern>
+      </PatternLayout>
+    </File>
+  </Appenders>
+  <Loggers>
+    <Root level="ERROR">
+      <AppenderRef ref="Console"/>
+    </Root>
+    
+    <Logger name="snae.tmc" level="DEBUG" additivity="false">
+      <AppenderRef ref="Console"/>
+    </Logger>
+    
+    <Logger name="org.apache" level="WARN">
+      <AppenderRef ref="Console"/>
+    </Logger>
+    <Logger name="httpclient" level="WARN">
+      <AppenderRef ref="Console"/>
+    </Logger>
+    <Logger name="org.hibernate" level="WARN">
+      <AppenderRef ref="Console"/>
+    </Logger>
+    <Logger name="com.gargoylesoftware" level="WARN">
+      <AppenderRef ref="Console"/>
+    </Logger>
+    <Logger name="net.sourceforge.htmlunit" level="WARN">
+      <AppenderRef ref="Console"/>
+    </Logger>
+  </Loggers>
+</Configuration>
