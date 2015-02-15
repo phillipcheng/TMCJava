@@ -12,9 +12,9 @@ import snae.tmc.TMHttpClient;
 public class TMHttpClientTest {
 	private static Logger logger = LogManager.getLogger(TMHttpClientTest.class);
 	
-	private static final String proxyhost="192.168.2.7";
-	//private static final String proxyhost="52.1.96.115";
-	private static final int proxyport=8080;
+	//private static final String proxyhost="192.168.2.8";
+	private static final String proxyhost="52.1.96.115";
+	private static final int proxyport=80;
 	private static final int SC_Unauthorized=401;
 	private static final int SC_Success=200;
 	private int statusCode =0;
@@ -26,7 +26,7 @@ public class TMHttpClientTest {
 	@Test
 	//success
 	public void test1(){
-		String user="cy2";
+		String user="cytest1";
 		TMHttpClient tmhttpclient = new TMHttpClient(user, proxyhost, proxyport);
 		tmhttpclient.start();
 		try{
@@ -34,12 +34,15 @@ public class TMHttpClientTest {
 			GetMethod method = new GetMethod(url1);
 			tmhttpclient.executeMethod(method);
 			statusCode = method.getStatusCode();
+			method.getResponseBody();
 			assertTrue(statusCode == SC_Success);
+			logger.info(String.format("status code is %d for getting url:%s", statusCode, url1));
 			//
 			method = new GetMethod(url2);
 			tmhttpclient.executeMethod(method);
 			statusCode = method.getStatusCode();
 			assertTrue(statusCode == SC_Success);
+			method.getResponseBody();
 			logger.info(String.format("status code is %d for getting url:%s", statusCode, url2));
 		}catch(Exception e){
 			logger.error("", e);
@@ -50,7 +53,7 @@ public class TMHttpClientTest {
 	@Test
 	//failed
 	public void test2(){
-		String user="cy2";
+		String user="cytest2";
 		TMHttpClient tmhttpclient = new TMHttpClient(user, proxyhost, proxyport);
 		try{
 			GetMethod method = new GetMethod(url1);
@@ -61,5 +64,31 @@ public class TMHttpClientTest {
 		}catch(Exception e){
 			logger.error("", e);
 		}
+	}
+	
+	@Test
+	//failed
+	public void test3(){
+		String user="cytest3";
+		TMHttpClient tmhttpclient = new TMHttpClient(user, proxyhost, proxyport);
+		tmhttpclient.start();
+		try{
+			while(true){
+				//
+				GetMethod method = new GetMethod(url1);
+				tmhttpclient.executeMethod(method);
+				statusCode = method.getStatusCode();
+				int len = method.getResponseBody().length;
+				if (statusCode == SC_Success){
+					logger.info(String.format("status code is %d for getting url:%s, len:%d", 
+							statusCode, url1, len));
+				}else{
+					break;
+				}
+			}
+		}catch(Exception e){
+			logger.error("", e);
+		}
+		tmhttpclient.end();
 	}
 }

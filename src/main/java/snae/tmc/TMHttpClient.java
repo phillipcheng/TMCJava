@@ -39,6 +39,13 @@ public class TMHttpClient extends HttpClient{
 	private String userId;
 	private String userSessionId;
 	private String failedReason = REASON_VAL_UNKNOWN;
+	
+	public static int STATUS_DISCONNECTED=0;
+	public static int STATUS_CONNECTING=1;
+	public static int STATUS_CONNECTED=2;
+	public static int STATUS_DISCONNECTING=3;
+	public static int STATUS_ERROR=4;
+	private int status;
 
 	private static HttpConnectionManager httpclientMgr = new MultiThreadedHttpConnectionManager();
 	
@@ -47,15 +54,18 @@ public class TMHttpClient extends HttpClient{
 		this.userId = userId;
 		HostConfiguration config = getHostConfiguration();
 		config.setProxy(proxyHost, proxyPort);
+		status = STATUS_DISCONNECTED;
 	}
 	
 	public TMHttpClient(String userId){
 		super(httpclientMgr);
 		this.userId = userId;
 		//get the proxyHost and port from proxy-selector-server
+		status = STATUS_DISCONNECTED;
 	}
 	
 	public boolean start(){
+		status = STATUS_CONNECTING;
 		HttpMethod method = new GetMethod(START_URL);
 		try {
 			method.setRequestHeader(HEADER_CMD, HEADER_CMDVAL_START);
@@ -66,23 +76,30 @@ public class TMHttpClient extends HttpClient{
             	if (header!=null){
                     logger.info(String.format("start ok. session id got:%s", header.getValue()));
                     userSessionId = header.getValue();
+            		status = STATUS_CONNECTED;
                     return true;
             	}else{
+            		status = STATUS_ERROR;
             		return false;
             	}
             }else{
             	Header header = method.getResponseHeader(HEADER_REASON);
             	if (header!=null){
             		logger.error(String.format("status code %d, rejected reason:%s", method.getStatusCode(), header.getValue()));
-            		failedReason = header.getValue();
+            		failedReason = "error:" + header.getValue();
+            		status = STATUS_ERROR;
             		return false;
             	}else{
             		logger.error(String.format("no rejected reason found. error status code %s:", method.getStatusCode()));
+            		failedReason = "unexpected status code:" + method.getStatusCode();
+            		status = STATUS_ERROR;
             		return false;
             	}
             }
 		}catch(Exception e){
 			logger.error("",e);
+			failedReason = e.toString();
+    		status = STATUS_ERROR;
 			return false;
 		}finally{
 			method.releaseConnection();
@@ -90,6 +107,7 @@ public class TMHttpClient extends HttpClient{
 	}
 	
 	public boolean end(){
+		status = STATUS_DISCONNECTING;
 		HttpMethod method = new GetMethod(START_URL);
 		try {
 			method.setRequestHeader(HEADER_CMD, HEADER_CMDVAL_STOP);
@@ -97,23 +115,27 @@ public class TMHttpClient extends HttpClient{
 	        super.executeMethod(method);
             if (method.getStatusCode() == HttpStatus.SC_OK) {
                 String result = method.getResponseBodyAsString();
-                logger.info(String.format("start ok. result body:%s", result));
+                logger.info(String.format("end ok. result body:%s", result));
+                status = STATUS_DISCONNECTED;
                 return true;
             }else{
             	Header header = method.getResponseHeader(HEADER_REASON);
             	if (header!=null){
             		logger.error(String.format("status code %d, rejected reason:%s", method.getStatusCode(), header.getValue()));
-            		failedReason = header.getValue();
+            		failedReason = "error:" + header.getValue();
+            		status = STATUS_ERROR;
             		return false;
             	}else{
             		logger.error(String.format("error status code %s:", method.getStatusCode()));
-            		failedReason = REASON_VAL_NORSPHEAD;
+            		failedReason = "unexpected status code:" + method.getStatusCode();
+            		status = STATUS_ERROR;
             		return false;
             	}
             }
 		}catch(Exception e){
 			logger.error("",e);
-			failedReason = REASON_VAL_UNKNOWN;
+			failedReason = e.toString();
+    		status = STATUS_ERROR;
 			return false;
 		}finally{
 			method.releaseConnection();
@@ -134,5 +156,12 @@ public class TMHttpClient extends HttpClient{
 	public void setFailedReason(String failedReason) {
 		this.failedReason = failedReason;
 	}
-	
+
+	public int getStatus() {
+		return status;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
+	}
 }
