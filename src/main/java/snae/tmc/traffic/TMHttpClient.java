@@ -1,4 +1,4 @@
-package snae.tmc;
+package snae.tmc.traffic;
 
 import java.io.IOException;
 

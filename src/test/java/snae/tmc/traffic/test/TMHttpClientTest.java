@@ -1,4 +1,4 @@
-package snae.tmc.test;
+package snae.tmc.traffic.test;
 
 import static org.junit.Assert.*;
 
@@ -7,13 +7,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 
-import snae.tmc.TMHttpClient;
+import snae.tmc.traffic.TMHttpClient;
 
 public class TMHttpClientTest {
 	private static Logger logger = LogManager.getLogger(TMHttpClientTest.class);
 	
-	//private static final String proxyhost="192.168.2.8";
-	private static final String proxyhost="52.1.96.115";
+	private static final String proxyhost="127.0.0.1";
+	//private static final String proxyhost="192.168.2.10";
+	//private static final String proxyhost="52.1.96.115";
 	private static final int proxyport=80;
 	private static final int SC_Unauthorized=401;
 	private static final int SC_Success=200;
@@ -26,7 +27,7 @@ public class TMHttpClientTest {
 	@Test
 	//success
 	public void test1(){
-		String user="cytest1";
+		String user="abc";
 		TMHttpClient tmhttpclient = new TMHttpClient(user, proxyhost, proxyport);
 		tmhttpclient.start();
 		try{
@@ -69,7 +70,7 @@ public class TMHttpClientTest {
 	@Test
 	//failed
 	public void test3(){
-		String user="cytest3";
+		String user="abc";
 		TMHttpClient tmhttpclient = new TMHttpClient(user, proxyhost, proxyport);
 		tmhttpclient.start();
 		try{

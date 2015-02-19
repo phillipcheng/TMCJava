@@ -1,4 +1,4 @@
-package snae.tmc.test;
+package snae.tmc.traffic.test;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,9 +8,9 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import snae.tmc.TMHttpUtil;
-import snae.tmc.TMURL;
-import snae.tmc.TMURLManager;
+import snae.tmc.traffic.TMHttpUtil;
+import snae.tmc.traffic.TMURL;
+import snae.tmc.traffic.TMURLManager;
 
 public class TMHttpClientThread extends Thread {
 	private static Logger logger = LogManager.getLogger(TMHttpClientThread.class);

@@ -1,4 +1,4 @@
-package snae.tmc.test;
+package snae.tmc.traffic.test;
 
 import static org.junit.Assert.assertTrue;
 
@@ -13,9 +13,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 
-import snae.tmc.TMHttpUtil;
-import snae.tmc.TMURL;
-import snae.tmc.TMURLManager;
+import snae.tmc.traffic.TMHttpUtil;
+import snae.tmc.traffic.TMURL;
+import snae.tmc.traffic.TMURLManager;
 
 
 public class TMURLTest {
