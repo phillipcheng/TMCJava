@@ -11,7 +11,11 @@ import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.provider.FormEncodingProvider;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
+
+import snae.tmc.app.test.AppTest;
 
 import com.vol.common.tenant.Promotion;
 import com.vol.common.user.Bonus;
@@ -20,6 +24,8 @@ import com.vol.common.user.User;
 import com.vol.rest.result.BunosResult;
 
 public class TMPublicClient {
+	private static Logger logger = LogManager.getLogger(TMPublicClient.class);
+	
 	private final String json = "application/json";
 	private final String form = "application/x-www-form-urlencoded";
 	
@@ -50,35 +56,22 @@ public class TMPublicClient {
 	}
 	
 	/**
-	 * @param userId 
+	 * @param userName
 	 * 
 	 */
-	public List<Quota> getQuota(int tenantId, long userId) {
+	public List<Quota> getQuota(int tenantId, String userName) {
 		Response restResult;
 		client2.reset();
 		//check quota
 		System.out.println("check quota");
-		client2.path("quota/"+tenantId+"/"+userId);
+		client2.path("quota/"+tenantId);
+		client2.query("userName", userName);
 		client2.type(form).accept(json);
 		restResult = client2.get();
 		GenericType<List<Quota>> quotalistType = new GenericType<List<Quota>>(){};
 		return restResult.readEntity(quotalistType);
 	}
-	
-	/**
-	 * @param bonusId 
-	 * 
-	 */
-	public Bonus getActivatedBonus(int tenantId, long userId, long bonusId) {
-		Response restResult;
-		client2.reset();
-		System.out.println("check activated bonus");
-		//check bonus
-		client2.path("bonus/"+tenantId+"/"+userId+"/"+bonusId);
-		client2.type(form).accept(json);
-		restResult = client2.get();
-		return restResult.readEntity(Bonus.class);
-	}
+
 	/**
 	 * @param bonusId 
 	 * 
@@ -96,7 +89,7 @@ public class TMPublicClient {
 	}
 	
 	/**
-	 * @param userId
+	 * @param userName
 	 * @return
 	 */
 	public List<Bonus> getUserBonus(int tenantId, String userName) {
@@ -105,7 +98,8 @@ public class TMPublicClient {
 
 		System.out.println("check user's bonus");
 		//check bonus
-		client2.path("bonus/"+tenantId+"/"+userName);
+		client2.path("bonus/"+tenantId);
+		client2.query("userName", userName);
 		client2.type(form).accept(json);
 		restResult = client2.get();
 		 GenericType<List<Bonus>> bonusListType = new GenericType<List<Bonus>>(){};
@@ -114,7 +108,7 @@ public class TMPublicClient {
 	}
 	
 	/**
-	 * @param promotionId 
+	 * @param userName 
 	 * 
 	 */
 	public BunosResult grabBonus(int tenantId, int promotionId, 
@@ -149,15 +143,29 @@ public class TMPublicClient {
 	 * @param userId 
 	 * 
 	 */
-	public List<Quota> checkQuota(int tenantId, String userName) {
+	public long checkQuota(int tenantId, String userName) {
 		Response restResult;
 		client2.reset();
 		//check quota
 		System.out.println("check quota");
-		client2.path("quota/"+tenantId+"/"+userName);
+		client2.path("quota/"+tenantId);
+		client2.query("userName", userName);
 		client2.type(form).accept(json);
 		restResult = client2.get();
-		 GenericType<List<Quota>> quotalistType = new GenericType<List<Quota>>(){};
-		return restResult.readEntity(quotalistType);
+		GenericType<List<Quota>> quotalistType = new GenericType<List<Quota>>(){};
+		try{
+			List<Quota> ql = restResult.readEntity(quotalistType);
+			if (ql.size()>0){
+				Quota q = ql.get(0);
+				logger.info("balance for tenant %d user %s is %d:", tenantId, userName, q.getBalance());
+				return q.getBalance();
+			}else{
+				logger.info(String.format("quota not found for tenant %d, user:%s", tenantId, userName));
+				return 0;
+			}
+		}catch(Exception e){
+			logger.info("", e);
+			return 0;
+		}
 	}
 }

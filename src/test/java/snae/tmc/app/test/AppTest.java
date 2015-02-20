@@ -13,11 +13,14 @@ import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.provider.FormEncodingProvider;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.junit.Test;
 
 import snae.tmc.app.TMAdminClient;
 import snae.tmc.app.TMPublicClient;
+import snae.tmc.traffic.test.TMHttpClientTest;
 
 import com.vol.common.tenant.Operator;
 import com.vol.common.tenant.Promotion;
@@ -35,6 +38,7 @@ import com.vol.rest.result.PutOperationResult;
  *
  */
 public class AppTest {
+	private static Logger logger = LogManager.getLogger(AppTest.class);
 	
 	private final String server = "http://52.1.96.115:8080";
 	private final long bonusSize = 5*1024*1024;
@@ -49,8 +53,7 @@ public class AppTest {
 		promotion.setDescription("Promotion Test1");
 		promotion.setName("Promotion1");
 		promotion.setMaximum(10);
-		promotion.setRule(String.format("return %l;", bonusSize));
-		
+		promotion.setRule(String.format("return %d;", bonusSize));
 
 		promotion.setTenantId(tenantId);
 		promotion.setLastUpdateOperator(operatorId);
@@ -69,32 +72,57 @@ public class AppTest {
 		//assert plist contains the promotionid
 		PromotionBalance pb = adminClient.checkPromotionbalance(promotionId);
 		long obalance = pb.getBalance();
+		long qobalance = publicClient.checkQuota(tenantId, userName);
+		logger.info(String.format("balance of promotion %d is %d", promotionId, obalance));
+		logger.info(String.format("balance of tenant %d, user %s is %d", tenantId, userName, qobalance));
+		
 		
 		BunosResult bonusResult = publicClient.grabBonus(tenantId, promotionId, userName, null);	
 
-		pb = adminClient.checkPromotionbalance(promotionId);
-		long nbalance = pb.getBalance();
-		//assert nbalance - obalance = bonusSize
-		
-		publicClient.activateBonus(tenantId, bonusResult.getBonus().getId());
-		
-		publicClient.checkQuota(tenantId, userName);
+		logger.info(String.format("result for grabBonus: %d", bonusResult.getCode()));
+		if (bonusResult.getBonus()!=null){
+			pb = adminClient.checkPromotionbalance(promotionId);
+			long nbalance = pb.getBalance();
+			publicClient.activateBonus(tenantId, bonusResult.getBonus().getId());
+			long qnbalance = publicClient.checkQuota(tenantId, userName);
+			
+			logger.info(String.format("balance of promotion %d is %d, gap is %d", 
+					promotionId, nbalance, nbalance-obalance));
+			logger.info(String.format("balance of tenant %d, user %s is %d, gap is %d", 
+					tenantId, userName, qnbalance, qnbalance-qobalance));
+		}
 	}
 	
 	@Test
 	public void test1(){
 		TMAdminClient adminClient = new TMAdminClient(server);
 		Tenant tanent = new Tenant();
-		tanent.setName("Tenant1");
-		tanent.setDescription("first Tenant");
+		tanent.setName("TenantAli");
+		tanent.setDescription("Ali Tenant");
 		int tenantId = adminClient.createTenant(tanent);
 		//
 		Operator operator = new Operator();
-		operator.setName("operator1");
-		operator.setPassword("passwor22d");
+		operator.setName("operatorAli1");
+		operator.setPassword("operatorAli1");
 		operator.setTenantId(tenantId);
 		int operatorId = adminClient.createOperator(operator);
 		//
 		
+		createAndActivatePromotion(tenantId, operatorId);
+	}
+	
+	@Test
+	public void CAAPromotion(){
+		int tenantId=3;
+		int operatorId=3;
+		createAndActivatePromotion(tenantId,operatorId);
+	}
+	
+	@Test
+	public void GAABonus(){
+		int tenantId = 3;
+		int promotionId = 3;
+		String userName = "abc";
+		this.grabAndActivateBonus(tenantId, promotionId, userName);
 	}
 }
