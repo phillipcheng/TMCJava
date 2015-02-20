@@ -31,9 +31,10 @@ public class TMURLTest {
 	@Test
 	//success
 	public void test1(){
-		String user="cy2";
+		String user="cynormal";
+		String tenantId = "3";
 		TMURLManager tmUrlMgr = new TMURLManager(proxyhost, proxyport);
-		tmUrlMgr.start(user);
+		tmUrlMgr.start(user, tenantId);
 
 		HttpURLConnection con = null;
 		InputStream is = null;
@@ -85,8 +86,9 @@ public class TMURLTest {
 	//out of balance
 	public void test3(){
 		String user="cytoomuch";
+		String tenantId = "3";
 		TMURLManager tmUrlMgr = new TMURLManager(proxyhost, proxyport);
-		tmUrlMgr.start(user);
+		tmUrlMgr.start(user, tenantId);
 
 		HttpURLConnection con = null;
 		InputStream is = null;
@@ -118,8 +120,9 @@ public class TMURLTest {
 	//client use multi-thread to use the same session, test server session lock
 	public void test4(){
 		String user="cyconcurrent";
+		String tenantId = "3";
 		TMURLManager tmUrlMgr = new TMURLManager(proxyhost, proxyport);
-		tmUrlMgr.start(user);
+		tmUrlMgr.start(user, tenantId);
 		String[] urls = new String[]{"http://news.sina.com.cn", "http://www.cnn.com"};
 		int numThreads=4;
 		List<Thread> runningThreads = new ArrayList<Thread>();

@@ -12,8 +12,8 @@ import snae.tmc.traffic.TMHttpClient;
 public class TMHttpClientTest {
 	private static Logger logger = LogManager.getLogger(TMHttpClientTest.class);
 	
-	private static final String proxyhost="127.0.0.1";
-	//private static final String proxyhost="192.168.2.10";
+	//private static final String proxyhost="127.0.0.1";
+	private static final String proxyhost="192.168.2.10";
 	//private static final String proxyhost="52.1.96.115";
 	private static final int proxyport=80;
 	private static final int SC_Unauthorized=401;
@@ -28,7 +28,8 @@ public class TMHttpClientTest {
 	//success
 	public void test1(){
 		String user="abc";
-		TMHttpClient tmhttpclient = new TMHttpClient(user, proxyhost, proxyport);
+		String tenantId="3";
+		TMHttpClient tmhttpclient = new TMHttpClient(user, tenantId, proxyhost, proxyport);
 		tmhttpclient.start();
 		try{
 			//
@@ -54,8 +55,9 @@ public class TMHttpClientTest {
 	@Test
 	//failed
 	public void test2(){
-		String user="cytest2";
-		TMHttpClient tmhttpclient = new TMHttpClient(user, proxyhost, proxyport);
+		String user="abc";
+		String tenantId="3";
+		TMHttpClient tmhttpclient = new TMHttpClient(user, tenantId, proxyhost, proxyport);
 		try{
 			GetMethod method = new GetMethod(url1);
 			tmhttpclient.executeMethod(method);
@@ -71,7 +73,8 @@ public class TMHttpClientTest {
 	//failed
 	public void test3(){
 		String user="abc";
-		TMHttpClient tmhttpclient = new TMHttpClient(user, proxyhost, proxyport);
+		String tenantId="3";
+		TMHttpClient tmhttpclient = new TMHttpClient(user, tenantId, proxyhost, proxyport);
 		tmhttpclient.start();
 		try{
 			while(true){

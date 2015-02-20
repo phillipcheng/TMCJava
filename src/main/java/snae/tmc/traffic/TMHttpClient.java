@@ -23,6 +23,7 @@ public class TMHttpClient extends HttpClient{
 	private static String HEADER_CMDVAL_STOP = "stop";
 	private static String HEADER_SESSIONID = "dsessionid";
 	private static String HEADER_USERID = "userid";
+	private static String HEADER_TENANTID = "tenantid";
 	private static String HEADER_REASON = "rejectreason";
 	
 	private static String REASON_VAL_SUCCESS="command succeed";
@@ -37,6 +38,7 @@ public class TMHttpClient extends HttpClient{
 	private static String REASON_VAL_UNKNOWN="unknown";
 
 	private String userId;
+	private String tenantId;
 	private String userSessionId;
 	private String failedReason = REASON_VAL_UNKNOWN;
 	
@@ -49,9 +51,10 @@ public class TMHttpClient extends HttpClient{
 
 	private static HttpConnectionManager httpclientMgr = new MultiThreadedHttpConnectionManager();
 	
-	public TMHttpClient(String userId, String proxyHost, int proxyPort){
+	public TMHttpClient(String userId, String tenantId, String proxyHost, int proxyPort){
 		super(httpclientMgr);
 		this.userId = userId;
+		this.tenantId = tenantId;
 		HostConfiguration config = getHostConfiguration();
 		config.setProxy(proxyHost, proxyPort);
 		status = STATUS_DISCONNECTED;
@@ -70,6 +73,7 @@ public class TMHttpClient extends HttpClient{
 		try {
 			method.setRequestHeader(HEADER_CMD, HEADER_CMDVAL_START);
 			method.setRequestHeader(HEADER_USERID, userId);
+			method.setRequestHeader(HEADER_TENANTID, tenantId);
 	        super.executeMethod(method);
             if (method.getStatusCode() == HttpStatus.SC_OK) {
             	Header header = method.getResponseHeader(HEADER_SESSIONID);

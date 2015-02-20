@@ -14,13 +14,18 @@ public class TMURLManager {
 	private static Logger logger = LogManager.getLogger(TMURLManager.class);
 	
 	private static final String START_URL="http://www.google.com";//any url
+	
+	//http req custom headers
 	private static String HEADER_CMD = "command";
 	private static String HEADER_CMDVAL_START = "start";
 	private static String HEADER_CMDVAL_STOP = "stop";
+	
 	public static String HEADER_SESSIONID = "dsessionid";
 	private static String HEADER_USERID = "userid";
-	private static String HEADER_REASON = "rejectreason";
+	private static String HEADER_TENANTID= "tenantid";
 	
+	//http rsp custom headers
+	private static String HEADER_REASON = "rejectreason";
 	private static String REASON_VAL_SUCCESS="command succeed";
 	private static String REASON_VAL_NOREQHEAD="no req head";
 	private static String REASON_VAL_REQHEAD_NOUSERIP="no user/ip in the start request header";
@@ -33,7 +38,6 @@ public class TMURLManager {
 	private static String REASON_VAL_UNKNOWN="unknown";
 
 	private Proxy proxy;
-	private String userId;
 	private String userSessionId;
 	private String failedReason = REASON_VAL_UNKNOWN;
 	
@@ -52,8 +56,7 @@ public class TMURLManager {
 		proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyIp, proxyPort));
 	}
 	
-	public boolean start(String userId){
-		this.userId = userId;
+	public boolean start(String userId, String tenantId){
 		setStatus(STATUS_CONNECTING);
 		HttpURLConnection con = null;
 		InputStream is = null;
@@ -62,6 +65,7 @@ public class TMURLManager {
 			con = (HttpURLConnection) url.openConnection(proxy);
 			con.setRequestProperty(HEADER_CMD, HEADER_CMDVAL_START);
 			con.setRequestProperty(HEADER_USERID, userId);
+			con.setRequestProperty(HEADER_TENANTID, tenantId);
 			con.setRequestMethod("GET");
 	        is = con.getInputStream();
 	        int code = con.getResponseCode();

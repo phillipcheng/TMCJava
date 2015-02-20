@@ -40,8 +40,10 @@ import com.vol.rest.result.PutOperationResult;
 public class AppTest {
 	private static Logger logger = LogManager.getLogger(AppTest.class);
 	
-	private final String server = "http://52.1.96.115:8080";
+	//private final String server = "http://52.1.96.115:8080";
+	private final String server = "http://127.0.0.1:8080";
 	private final long bonusSize = 5*1024*1024;
+	private final long promotionMaxSize = 20*1024*1024;
 	
 	public int createAndActivatePromotion(int tenantId, int operatorId){
 		TMAdminClient adminClient = new TMAdminClient(server);
@@ -52,7 +54,7 @@ public class AppTest {
 		promotion.setEndTime(System.currentTimeMillis()+365*24*60*60*1000);
 		promotion.setDescription("Promotion Test1");
 		promotion.setName("Promotion1");
-		promotion.setMaximum(10);
+		promotion.setMaximum(promotionMaxSize);
 		promotion.setRule(String.format("return %d;", bonusSize));
 
 		promotion.setTenantId(tenantId);
@@ -121,7 +123,7 @@ public class AppTest {
 	@Test
 	public void GAABonus(){
 		int tenantId = 3;
-		int promotionId = 3;
+		int promotionId = 4;
 		String userName = "abc";
 		this.grabAndActivateBonus(tenantId, promotionId, userName);
 	}
