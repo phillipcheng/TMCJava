@@ -13,8 +13,8 @@ public class TMHttpClientTest {
 	private static Logger logger = LogManager.getLogger(TMHttpClientTest.class);
 	
 	//private static final String proxyhost="127.0.0.1";
-	private static final String proxyhost="192.168.2.10";
-	//private static final String proxyhost="52.1.96.115";
+	//private static final String proxyhost="192.168.2.10";
+	private static final String proxyhost="52.1.96.115";
 	private static final int proxyport=80;
 	private static final int SC_Unauthorized=401;
 	private static final int SC_Success=200;

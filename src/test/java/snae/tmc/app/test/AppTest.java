@@ -3,16 +3,6 @@
  */
 package snae.tmc.app.test;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.Response;
-
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
-import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.jaxrs.provider.FormEncodingProvider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
@@ -40,13 +30,12 @@ import com.vol.rest.result.PutOperationResult;
 public class AppTest {
 	private static Logger logger = LogManager.getLogger(AppTest.class);
 	
-	//private final String server = "http://52.1.96.115:8080";
-	private final String server = "http://127.0.0.1:8080";
-	private final long bonusSize = 5*1024*1024;
-	private final long promotionMaxSize = 20*1024*1024;
+	private final String server = "http://52.1.96.115:8080";
+	private static final long bonusSize = 5*1024*1024;
+	private static final long promotionMaxSize = 20*1024*1024;
 	
-	public int createAndActivatePromotion(int tenantId, int operatorId){
-		TMAdminClient adminClient = new TMAdminClient(server);
+	public static int createAndActivatePromotion(String serverUrl,int tenantId, int operatorId){
+		TMAdminClient adminClient = new TMAdminClient(serverUrl);
 		
 		Promotion promotion = new Promotion();
 		promotion.setBonusExpirationTime(System.currentTimeMillis()+365*24*60*60*1000);
@@ -66,11 +55,10 @@ public class AppTest {
 		return promotionId;
 	}
 	
-	public void grabAndActivateBonus(int tenantId, int promotionId, String userName){
-		TMPublicClient publicClient = new TMPublicClient(server);
-		TMAdminClient adminClient = new TMAdminClient(server);
+	public static void grabAndActivateBonus(String serverUrl, int tenantId, int promotionId, String userName){
+		TMPublicClient publicClient = new TMPublicClient(serverUrl);
+		TMAdminClient adminClient = new TMAdminClient(serverUrl);
 		
-		List<Promotion> plist = publicClient.listPublicPromotion(tenantId);
 		//assert plist contains the promotionid
 		PromotionBalance pb = adminClient.checkPromotionbalance(promotionId);
 		long obalance = pb.getBalance();
@@ -79,7 +67,7 @@ public class AppTest {
 		logger.info(String.format("balance of tenant %d, user %s is %d", tenantId, userName, qobalance));
 		
 		
-		BunosResult bonusResult = publicClient.grabBonus(tenantId, promotionId, userName, null);	
+		BunosResult bonusResult = publicClient.grabBonus(tenantId, promotionId, userName, null);
 
 		logger.info(String.format("result for grabBonus: %d", bonusResult.getCode()));
 		if (bonusResult.getBonus()!=null){
@@ -110,14 +98,14 @@ public class AppTest {
 		int operatorId = adminClient.createOperator(operator);
 		//
 		
-		createAndActivatePromotion(tenantId, operatorId);
+		createAndActivatePromotion(server, tenantId, operatorId);
 	}
 	
 	@Test
 	public void CAAPromotion(){
 		int tenantId=3;
 		int operatorId=3;
-		createAndActivatePromotion(tenantId,operatorId);
+		createAndActivatePromotion(server, tenantId,operatorId);
 	}
 	
 	@Test
@@ -125,6 +113,6 @@ public class AppTest {
 		int tenantId = 3;
 		int promotionId = 4;
 		String userName = "abc";
-		this.grabAndActivateBonus(tenantId, promotionId, userName);
+		grabAndActivateBonus(server, tenantId, promotionId, userName);
 	}
 }

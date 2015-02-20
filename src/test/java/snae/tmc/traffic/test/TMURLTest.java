@@ -119,7 +119,7 @@ public class TMURLTest {
 	@Test
 	//client use multi-thread to use the same session, test server session lock
 	public void test4(){
-		String user="cyconcurrent";
+		String user="abc";
 		String tenantId = "3";
 		TMURLManager tmUrlMgr = new TMURLManager(proxyhost, proxyport);
 		tmUrlMgr.start(user, tenantId);
