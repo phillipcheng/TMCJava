@@ -1,6 +1,6 @@
-# TMCAndroid (Traffic Management Client)
+# TMCJava (Traffic Management Client)
 
-SNAE android/java client API
+SNAE Java client API
 
 1. App API
 
