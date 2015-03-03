@@ -100,7 +100,7 @@ public class TMURLTest {
 				con = tmurl1.getHttpUrlConnection();
 				con.setRequestMethod("GET");
 		        code = con.getResponseCode();
-				if (code == TMURLManager.SC_UNAUTHORIZED){
+				if (code == TMURLManager.SC_OK){
 			        is = con.getInputStream();
 					String str = TMHttpUtil.getStringFromInputStream(is);
 					logger.info(String.format("get content of %d length for url:%s.", str.length(), url1));
