@@ -21,8 +21,8 @@ import snae.tmc.traffic.TMURLManager;
 public class TMURLTest {
 	private static Logger logger = LogManager.getLogger(TMURLTest.class);
 	
-	//private static final String proxyhost="192.168.2.8";
-	private static final String proxyhost="52.1.96.115";
+	private static final String proxyhost="192.168.2.7";
+	//private static final String proxyhost="52.1.96.115";
 	private static final int proxyport=80;
 	
 	private static String url1= "http://news.sina.com.cn";

@@ -30,7 +30,7 @@ import com.vol.rest.result.PutOperationResult;
 public class AppTest {
 	private static Logger logger = LogManager.getLogger(AppTest.class);
 	
-	private final String server = "http://52.1.96.115:8080";
+	private final String server = "http://52.1.96.115:80";
 	private static final long bonusSize = 5*1024*1024;
 	private static final long promotionMaxSize = 20*1024*1024;
 	
@@ -90,15 +90,8 @@ public class AppTest {
 		tanent.setName("TenantAli");
 		tanent.setDescription("Ali Tenant");
 		int tenantId = adminClient.createTenant(tanent);
-		//
-		Operator operator = new Operator();
-		operator.setName("operatorAli1");
-		operator.setPassword("operatorAli1");
-		operator.setTenantId(tenantId);
-		int operatorId = adminClient.createOperator(operator);
-		//
 		
-		createAndActivatePromotion(server, tenantId, operatorId);
+		createAndActivatePromotion(server, tenantId, 1);
 	}
 	
 	@Test
