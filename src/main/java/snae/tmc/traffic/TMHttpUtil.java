@@ -13,12 +13,12 @@ public class TMHttpUtil {
 		}else{
 			reader = new BufferedReader(new InputStreamReader(in, encoding));
 		}
-        String result, line = reader.readLine();
-        result = line;
-        while((line = reader.readLine()) != null) {
-            result += line;
-        }
-        return result;
+		String line = null;
+		StringBuilder responseData = new StringBuilder();
+		while((line = reader.readLine()) != null) {
+		    responseData.append(line);
+		}
+        return responseData.toString();
 	}
 	
 	public static String getStringFromInputStream(InputStream in) throws IOException{		
