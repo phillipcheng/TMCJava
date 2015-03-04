@@ -20,7 +20,6 @@ public class TMURLManager {
 	private static String HEADER_CMDVAL_START = "start";
 	private static String HEADER_CMDVAL_STOP = "stop";
 	
-	public static String HEADER_SESSIONID = "dsessionid";
 	private static String HEADER_USERID = "userid";
 	private static String HEADER_TENANTID= "tenantid";
 	
@@ -38,7 +37,6 @@ public class TMURLManager {
 	private static String REASON_VAL_UNKNOWN="unknown";
 
 	private Proxy proxy;
-	private String userSessionId;
 	private String failedReason = REASON_VAL_UNKNOWN;
 	
 	
@@ -71,16 +69,9 @@ public class TMURLManager {
 	        int code = con.getResponseCode();
 	        
             if (code == SC_OK) {
-            	String sessionVal = con.getHeaderField(HEADER_SESSIONID);
-            	if (sessionVal!=null){
-                    logger.info(String.format("start ok. session id got:%s", sessionVal));
-                    userSessionId = sessionVal;
-            		setStatus(STATUS_CONNECTED);
-                    return true;
-            	}else{
-            		setStatus(STATUS_ERROR);
-            		return false;
-            	}
+            	logger.info(String.format("start ok: status code %d.", code));
+        		setStatus(STATUS_ERROR);
+        		return false;
             }else{
             	String reasonVal = con.getHeaderField(HEADER_REASON);
             	if (reasonVal!=null){
@@ -119,12 +110,11 @@ public class TMURLManager {
 			URL url = new URL(START_URL);
 			con = (HttpURLConnection) url.openConnection(proxy);
 			con.setRequestProperty(HEADER_CMD, HEADER_CMDVAL_STOP);
-			con.setRequestProperty(HEADER_SESSIONID, userSessionId);
 			con.setRequestMethod("GET");
 	        is = con.getInputStream();
 	        int code = con.getResponseCode();
             if (code == SC_OK) {
-            	logger.error(String.format("end ok: status code %d.", code));
+            	logger.info(String.format("end ok: status code %d.", code));
                 setStatus(STATUS_DISCONNECTED);
                 return true;
             }else{
@@ -159,7 +149,7 @@ public class TMURLManager {
 	
 	public TMURL getUrl(String strUrl) throws MalformedURLException{
 		URL url = new URL(strUrl);
-		return new TMURL(url, proxy, userSessionId);
+		return new TMURL(url, proxy);
 	}
 
 	public int getStatus() {

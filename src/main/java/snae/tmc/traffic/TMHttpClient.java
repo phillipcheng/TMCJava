@@ -1,12 +1,9 @@
 package snae.tmc.traffic;
 
-import java.io.IOException;
-
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpConnectionManager;
-import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
@@ -21,7 +18,6 @@ public class TMHttpClient extends HttpClient{
 	private static String HEADER_CMD = "command";
 	private static String HEADER_CMDVAL_START = "start";
 	private static String HEADER_CMDVAL_STOP = "stop";
-	private static String HEADER_SESSIONID = "dsessionid";
 	private static String HEADER_USERID = "userid";
 	private static String HEADER_TENANTID = "tenantid";
 	private static String HEADER_REASON = "rejectreason";
@@ -39,7 +35,6 @@ public class TMHttpClient extends HttpClient{
 
 	private String userId;
 	private String tenantId;
-	private String userSessionId;
 	private String failedReason = REASON_VAL_UNKNOWN;
 	
 	public static int STATUS_DISCONNECTED=0;
@@ -76,16 +71,8 @@ public class TMHttpClient extends HttpClient{
 			method.setRequestHeader(HEADER_TENANTID, tenantId);
 	        super.executeMethod(method);
             if (method.getStatusCode() == HttpStatus.SC_OK) {
-            	Header header = method.getResponseHeader(HEADER_SESSIONID);
-            	if (header!=null){
-                    logger.info(String.format("start ok. session id got:%s", header.getValue()));
-                    userSessionId = header.getValue();
-            		status = STATUS_CONNECTED;
-                    return true;
-            	}else{
-            		status = STATUS_ERROR;
-            		return false;
-            	}
+        		status = STATUS_ERROR;
+        		return false;
             }else{
             	Header header = method.getResponseHeader(HEADER_REASON);
             	if (header!=null){
@@ -115,7 +102,6 @@ public class TMHttpClient extends HttpClient{
 		HttpMethod method = new GetMethod(START_URL);
 		try {
 			method.setRequestHeader(HEADER_CMD, HEADER_CMDVAL_STOP);
-			method.setRequestHeader(HEADER_SESSIONID, userSessionId);
 	        super.executeMethod(method);
             if (method.getStatusCode() == HttpStatus.SC_OK) {
                 String result = method.getResponseBodyAsString();
@@ -144,13 +130,6 @@ public class TMHttpClient extends HttpClient{
 		}finally{
 			method.releaseConnection();
 		}
-	}
-	
-	@Override
-	public int executeMethod(HttpMethod method)
-	        throws IOException, HttpException  {
-		method.setRequestHeader(HEADER_SESSIONID, userSessionId);
-		return super.executeMethod(method);
 	}
 	
 	public String getFailedReason() {

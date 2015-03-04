@@ -30,20 +30,7 @@ public class TMHttpClientThread extends Thread {
 	public void run() {
 		for (String url: urls){
 			try {
-				TMURL tmUrl = tmMgr.getUrl(url);
-				HttpURLConnection con = tmUrl.getHttpUrlConnection();
-		        int code = con.getResponseCode();
-				if (code == HttpURLConnection.HTTP_UNAUTHORIZED){
-					logger.info(String.format("thread %d, unauthorized for url:%s.", 
-							threadId, url));
-					break;
-				}else{
-					InputStream is = con.getInputStream();
-					String str = TMHttpUtil.getStringFromInputStream(is);
-					logger.info(String.format("thread %d, content of %d length for url:%s.", 
-							threadId, str.length(), url));
-					is.close();
-				}
+				TMHttpUtil.getContentFromHttpGetURL(tmMgr, url);
 			} catch (IOException e) {
 				logger.error("", e);
 			}

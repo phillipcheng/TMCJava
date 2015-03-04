@@ -6,6 +6,8 @@ import java.net.MalformedURLException;
 import java.net.Proxy;
 import java.net.URL;
 
+import javax.net.ssl.HttpsURLConnection;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,12 +17,10 @@ public class TMURL {
 	
 	URL url;
 	Proxy proxy = null;
-	String sessionId = null;
 	
-	public TMURL(URL url, Proxy proxy, String sessionId){
+	public TMURL(URL url, Proxy proxy){
 		this.url = url;
 		this.proxy = proxy;
-		this.sessionId = sessionId;
 	}
 	
 	//for normal access
@@ -37,7 +37,15 @@ public class TMURL {
 			return (HttpURLConnection) url.openConnection();
 		}else{
 			HttpURLConnection con = (HttpURLConnection) url.openConnection(proxy);
-			con.setRequestProperty(TMURLManager.HEADER_SESSIONID, sessionId);
+			return con;
+		}
+	}
+	
+	public HttpsURLConnection getHttpsUrlConnection() throws IOException{
+		if (proxy==null){
+			return (HttpsURLConnection) url.openConnection();
+		}else{
+			HttpsURLConnection con = (HttpsURLConnection) url.openConnection(proxy);
 			return con;
 		}
 	}

@@ -21,43 +21,34 @@ import snae.tmc.traffic.TMURLManager;
 public class TMURLTest {
 	private static Logger logger = LogManager.getLogger(TMURLTest.class);
 	
-	private static final String proxyhost="192.168.2.7";
-	//private static final String proxyhost="52.1.96.115";
-	private static final int proxyport=80;
+	//private static final String proxyhost="192.168.2.7";
+	private static final String proxyhost="52.1.96.115";
+	private static final int proxyport=8080;
 	
-	private static String url1= "http://news.sina.com.cn";
-	private static String url2= "http://finance.sina.com.cn/";
+	private static String url1= "http://www.ebay.com/";
+	private static String url2= "https://www.yahoo.com/";
+	
+	@Test
+	public void testStopSession(){
+		TMURLManager tmUrlMgr = new TMURLManager(proxyhost, proxyport);
+		tmUrlMgr.end();
+	}
 	
 	@Test
 	//success
 	public void test1(){
-		String user="cynormal";
+		String user="1234";
 		String tenantId = "3";
 		TMURLManager tmUrlMgr = new TMURLManager(proxyhost, proxyport);
 		tmUrlMgr.start(user, tenantId);
-
-		HttpURLConnection con = null;
-		InputStream is = null;
-		int code;
 		try{
-			//
-			TMURL tmurl1 = tmUrlMgr.getUrl(url1);
-			con = tmurl1.getHttpUrlConnection();
-			con.setRequestMethod("GET");
-	        is = con.getInputStream();
-	        code = con.getResponseCode();
-			assertTrue(code == TMURLManager.SC_OK);
-			TMHttpUtil.getStringFromInputStream(is);
-			is.close();
-			
-			//
-			tmurl1 = tmUrlMgr.getUrl(url2);
-			con = tmurl1.getHttpUrlConnection();
-			con.setRequestMethod("GET");
-			is = con.getInputStream();
-			TMHttpUtil.getStringFromInputStream(is);
-	        code = con.getResponseCode();
-			assertTrue(code == TMURLManager.SC_OK);
+			for (int i=0;i<2;i++){
+				//
+				//TMHttpUtil.getContentFromHttpGetURL(tmUrlMgr, url1);
+				TMHttpUtil.getContentFromHttpsGetURL(tmUrlMgr, url2);
+				//TMHttpUtil.getContentFromHttpGetURL(tmUrlMgr, url1);
+				TMHttpUtil.getContentFromHttpsGetURL(tmUrlMgr, url2);
+			}
 		}catch(Exception e){
 			logger.error("", e);
 		}
@@ -85,30 +76,15 @@ public class TMURLTest {
 	@Test
 	//out of balance
 	public void test3(){
-		String user="cytoomuch";
+		String user="1234";
 		String tenantId = "3";
 		TMURLManager tmUrlMgr = new TMURLManager(proxyhost, proxyport);
 		tmUrlMgr.start(user, tenantId);
-
-		HttpURLConnection con = null;
-		InputStream is = null;
-		int code;
+		
 		try{
 			while (true){
 				//
-				TMURL tmurl1 = tmUrlMgr.getUrl(url1);
-				con = tmurl1.getHttpUrlConnection();
-				con.setRequestMethod("GET");
-		        code = con.getResponseCode();
-				if (code == TMURLManager.SC_OK){
-			        is = con.getInputStream();
-					String str = TMHttpUtil.getStringFromInputStream(is);
-					logger.info(String.format("get content of %d length for url:%s.", str.length(), url1));
-					is.close();
-				}else{
-					logger.info(String.format("get not ok status code %d for url %s.", code, url1));
-					break;
-				}
+				TMHttpUtil.getContentFromHttpGetURL(tmUrlMgr, url1);
 			}
 		}catch(Exception e){
 			logger.error("", e);
